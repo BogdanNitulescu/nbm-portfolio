@@ -390,3 +390,5 @@ video:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.18); }
 @media (max-width: 900px){
   .work-item{ grid-column: span 12; }
 }
+.featured-video{ min-height: 220px; }
+
