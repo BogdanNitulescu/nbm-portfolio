@@ -112,5 +112,3 @@ if (featuredCard && featuredVideo) {
       featuredVideo.volume = 0.8;
     });
   }
-
-}
