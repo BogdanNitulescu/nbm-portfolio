@@ -26,8 +26,7 @@ const revealIO = new IntersectionObserver((entries) => {
 
 revealEls.forEach(el => revealIO.observe(el));
 
-/* ---------- Featured random video (only existing files) ---------- */
-/* ---------- Featured random video (mobile-safe fallback) ---------- */
+/* ---------- Featured random video (iPhone-safe) ---------- */
 const featuredCard = document.getElementById('featuredCard');
 const featuredVideo = document.getElementById('featuredVideo');
 
@@ -40,31 +39,29 @@ if (featuredCard && featuredVideo) {
     'assets/author1.mp4'
   ];
 
-  // shuffle
+  // shuffle once
   const queue = [...featuredPool].sort(() => 0.5 - Math.random());
-  let currentIndex = 0;
+  let idx = 0;
 
-  function trySetVideo(i) {
+  function setSrc(i){
     if (i >= queue.length) return;
-    currentIndex = i;
-
-    // lazy-ish: set src only when we decide to load
+    idx = i;
     featuredVideo.src = queue[i];
     featuredVideo.load();
   }
 
-  // if a file fails (missing / unsupported), try next
+  // If a video fails (missing / unsupported), try next
   featuredVideo.addEventListener('error', () => {
-    trySetVideo(currentIndex + 1);
+    setSrc(idx + 1);
   });
 
-  // autoplay only in viewport (but ALWAYS set a src when it becomes visible)
+  // IMPORTANT: set a src immediately so the element has size on iPhone
+  setSrc(0);
+
+  // Autoplay only when visible
   const videoIO = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        if (!featuredVideo.src) {
-          trySetVideo(0);
-        }
         featuredVideo.play().catch(()=>{});
       } else {
         featuredVideo.pause();
@@ -74,26 +71,13 @@ if (featuredCard && featuredVideo) {
 
   videoIO.observe(featuredVideo);
 
-  // sound toggle only on click (policy-safe)
+  // Sound toggle only on click (policy-safe)
   featuredVideo.addEventListener('click', () => {
     featuredVideo.muted = !featuredVideo.muted;
     featuredVideo.volume = 0.8;
   });
 }
 
-
-  // Autoplay ONLY when visible
-  const videoIO = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        featuredVideo.play().catch(()=>{});
-      } else {
-        featuredVideo.pause();
-      }
-    });
-  }, { threshold: 0.35 });
-
-  videoIO.observe(featuredVideo);
 
     // Hover sound (desktop)
   const isTouch = window.matchMedia('(hover: none)').matches;
@@ -112,5 +96,6 @@ if (featuredCard && featuredVideo) {
       featuredVideo.volume = 0.8;
     });
   }
+
 
 
