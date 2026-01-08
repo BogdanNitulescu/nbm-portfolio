@@ -27,6 +27,7 @@ const revealIO = new IntersectionObserver((entries) => {
 revealEls.forEach(el => revealIO.observe(el));
 
 /* ---------- Featured random video (only existing files) ---------- */
+/* ---------- Featured random video (mobile-safe fallback) ---------- */
 const featuredCard = document.getElementById('featuredCard');
 const featuredVideo = document.getElementById('featuredVideo');
 
@@ -39,49 +40,41 @@ if (featuredCard && featuredVideo) {
     'assets/author1.mp4'
   ];
 
-  async function pickExistingVideo(list){
-    for (const src of list.sort(() => 0.5 - Math.random())) {
-      try {
-        const res = await fetch(src, { method: 'HEAD' });
-        if (res.ok) return src;
-      } catch (e) {}
-    }
-    return null;
+  // shuffle
+  const queue = [...featuredPool].sort(() => 0.5 - Math.random());
+  let currentIndex = 0;
+
+  function trySetVideo(i) {
+    if (i >= queue.length) return;
+    currentIndex = i;
+
+    // lazy-ish: set src only when we decide to load
+    featuredVideo.src = queue[i];
+    featuredVideo.load();
   }
 
-  (async () => {
-    const pick = await pickExistingVideo(featuredPool);
-    if (!pick) return;
-
-    featuredVideo.dataset.src = pick;
-    featuredVideo.load();
-
-    // retry autoplay (GitHub Pages safe)
-    setTimeout(() => {
-      featuredVideo.play().catch(()=>{});
-    }, 300);
-
-const videoIO = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-
-      // LAZY LOAD: încarcă video DOAR când intră în viewport
-      if (!featuredVideo.src) {
-        featuredVideo.src = featuredVideo.dataset.src;
-        featuredVideo.load();
-      }
-
-      featuredVideo.play().catch(()=>{});
-
-    } else {
-      featuredVideo.pause();
-    }
+  // if a file fails (missing / unsupported), try next
+  featuredVideo.addEventListener('error', () => {
+    trySetVideo(currentIndex + 1);
   });
-}, { threshold: 0.35 });
 
-videoIO.observe(featuredVideo);
+  // autoplay only in viewport (but ALWAYS set a src when it becomes visible)
+  const videoIO = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (!featuredVideo.src) {
+          trySetVideo(0);
+        }
+        featuredVideo.play().catch(()=>{});
+      } else {
+        featuredVideo.pause();
+      }
+    });
+  }, { threshold: 0.25 });
 
-  // sound toggle ONLY by click (policy-safe)
+  videoIO.observe(featuredVideo);
+
+  // sound toggle only on click (policy-safe)
   featuredVideo.addEventListener('click', () => {
     featuredVideo.muted = !featuredVideo.muted;
     featuredVideo.volume = 0.8;
@@ -119,4 +112,5 @@ videoIO.observe(featuredVideo);
       featuredVideo.volume = 0.8;
     });
   }
+
 
