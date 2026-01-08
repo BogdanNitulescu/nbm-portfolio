@@ -26,7 +26,7 @@ const revealIO = new IntersectionObserver((entries) => {
 
 revealEls.forEach(el => revealIO.observe(el));
 
-/* ---------- Featured random video (autoplay only in viewport) ---------- */
+/* ---------- Featured random video (only existing files) ---------- */
 const featuredCard = document.getElementById('featuredCard');
 const featuredVideo = document.getElementById('featuredVideo');
 
@@ -39,8 +39,48 @@ if (featuredCard && featuredVideo) {
     'assets/author1.mp4'
   ];
 
-  const pick = featuredPool[Math.floor(Math.random() * featuredPool.length)];
-  featuredVideo.src = pick;
+  async function pickExistingVideo(list){
+    for (const src of list.sort(() => 0.5 - Math.random())) {
+      try {
+        const res = await fetch(src, { method: 'HEAD' });
+        if (res.ok) return src;
+      } catch (e) {}
+    }
+    return null;
+  }
+
+  (async () => {
+    const pick = await pickExistingVideo(featuredPool);
+    if (!pick) return;
+
+    featuredVideo.src = pick;
+    featuredVideo.load();
+
+    // retry autoplay (GitHub Pages safe)
+    setTimeout(() => {
+      featuredVideo.play().catch(()=>{});
+    }, 300);
+
+    const videoIO = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          featuredVideo.play().catch(()=>{});
+        } else {
+          featuredVideo.pause();
+        }
+      });
+    }, { threshold: 0.35 });
+
+    videoIO.observe(featuredVideo);
+  })();
+
+  // sound toggle ONLY by click (policy-safe)
+  featuredVideo.addEventListener('click', () => {
+    featuredVideo.muted = !featuredVideo.muted;
+    featuredVideo.volume = 0.8;
+  });
+}
+
 
   // Autoplay ONLY when visible
   const videoIO = new IntersectionObserver((entries) => {
