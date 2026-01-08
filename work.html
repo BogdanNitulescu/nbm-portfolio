@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Work — NBM Nitulescu Bogdan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfolio of concept video ads: Real Estate, Influencers, Entrepreneurs, Online Authors." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<!-- FULLSCREEN VIDEO MODAL -->
+<div class="modal" id="videoModal" aria-hidden="true">
+  <button class="modal-close" id="closeModal" type="button">✕</button>
+  <video id="modalVideo" class="modal-video" autoplay muted playsinline></video>
+  <button class="modal-sound" id="toggleSound" type="button">Sound</button>
+</div>
+
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">NBM Nitulescu Bogdan</a>
+    <nav class="nav-links">
+      <a href="work.html">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact" class="pill">Start a Project</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero container">
+  <p class="kicker">Portfolio</p>
+  <h1>Work Samples</h1>
+  <p class="lead">Concept ads created for portfolio demonstration purposes.</p>
+
+  <div class="work-filters">
+    <button class="filter-btn is-active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="realestate">Real Estate</button>
+    <button class="filter-btn" data-filter="influencers">Influencers</button>
+    <button class="filter-btn" data-filter="entrepreneurs">Entrepreneurs</button>
+    <button class="filter-btn" data-filter="authors">Online Authors</button>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="work-grid">
+    <div class="work-item" data-cat="realestate">
+      <video controls playsinline src="assets/realestate1.mp4"></video>
+      <p class="fine">Real Estate — Concept Ad</p>
+    </div>
+
+    <div class="work-item" data-cat="realestate">
+      <video controls playsinline src="assets/realestate2.mp4"></video>
+      <p class="fine">Real Estate — Concept Ad</p>
+    </div>
+
+    <div class="work-item" data-cat="influencers">
+      <video controls playsinline src="assets/influencer1.mp4"></video>
+      <p class="fine">Influencers — Concept Ad</p>
+    </div>
+
+    <div class="work-item" data-cat="entrepreneurs">
+      <video controls playsinline src="assets/biz1.mp4"></video>
+      <p class="fine">Entrepreneurs — Concept Ad</p>
+    </div>
+
+    <div class="work-item" data-cat="authors">
+      <video controls playsinline src="assets/author1.mp4"></video>
+      <p class="fine">Online Authors — Concept Ad</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <span>© 2026 NBM Nitulescu Bogdan — All rights reserved</span>
+    <span class="fine">Built with HTML/CSS • Hosted on GitHub Pages</span>
+  </div>
+</footer>
+
+<script>
+  const btns = document.querySelectorAll('.filter-btn');
+  const items = document.querySelectorAll('.work-item');
+
+  btns.forEach(b => b.addEventListener('click', () => {
+    btns.forEach(x => x.classList.remove('is-active'));
+    b.classList.add('is-active');
+
+    const f = b.dataset.filter;
+    items.forEach(it => {
+      const cat = it.dataset.cat;
+      it.style.display = (f === 'all' || cat === f) ? '' : 'none';
+    });
+  }));
+</script>
+</body>
+</html>
