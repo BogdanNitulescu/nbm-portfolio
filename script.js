@@ -53,7 +53,7 @@ if (featuredCard && featuredVideo) {
     const pick = await pickExistingVideo(featuredPool);
     if (!pick) return;
 
-    featuredVideo.src = pick;
+    featuredVideo.dataset.src = pick;
     featuredVideo.load();
 
     // retry autoplay (GitHub Pages safe)
@@ -61,18 +61,25 @@ if (featuredCard && featuredVideo) {
       featuredVideo.play().catch(()=>{});
     }, 300);
 
-    const videoIO = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          featuredVideo.play().catch(()=>{});
-        } else {
-          featuredVideo.pause();
-        }
-      });
-    }, { threshold: 0.35 });
+const videoIO = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
 
-    videoIO.observe(featuredVideo);
-  })();
+      // LAZY LOAD: încarcă video DOAR când intră în viewport
+      if (!featuredVideo.src) {
+        featuredVideo.src = featuredVideo.dataset.src;
+        featuredVideo.load();
+      }
+
+      featuredVideo.play().catch(()=>{});
+
+    } else {
+      featuredVideo.pause();
+    }
+  });
+}, { threshold: 0.35 });
+
+videoIO.observe(featuredVideo);
 
   // sound toggle ONLY by click (policy-safe)
   featuredVideo.addEventListener('click', () => {
@@ -112,3 +119,4 @@ if (featuredCard && featuredVideo) {
       featuredVideo.volume = 0.8;
     });
   }
+
