@@ -11,49 +11,90 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-// Reveal on scroll (generic)
-const baseReveal = document.querySelectorAll('.section, .card, .page-hero, .videos-grid, .work-item');
-baseReveal.forEach(el => el.classList.add('reveal'));
+// Reveal on scroll
+const revealEls = document.querySelectorAll('.section, .card, .page-hero, .videos-grid, .featured-card');
+revealEls.forEach(el => el.classList.add('reveal'));
 
-const io = new IntersectionObserver((entries) => {
+const revealIO = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       entry.target.classList.add('is-visible');
-      io.unobserve(entry.target);
+      revealIO.unobserve(entry.target);
     }
   });
 }, { threshold: 0.12 });
 
-baseReveal.forEach(el => io.observe(el));
+revealEls.forEach(el => revealIO.observe(el));
 
-/* ---- WORK FILTERS (only if present on page) ---- */
-const btns = document.querySelectorAll('.filter-btn');
-const items = document.querySelectorAll('.work-item');
+/* ---------- Featured random video (iPhone-safe) ---------- */
+const featuredCard = document.getElementById('featuredCard');
+const featuredVideo = document.getElementById('featuredVideo');
 
-if (btns.length && items.length) {
-  const applyFilter = (f) => {
-    items.forEach((it) => {
-      const cat = it.dataset.cat;
-      const show = (f === 'all' || cat === f);
+if (featuredCard && featuredVideo) {
+  const featuredPool = [
+    'assets/realestate1.mp4',
+    'assets/realestate2.mp4',
+    'assets/influencer1.mp4',
+    'assets/biz1.mp4',
+    'assets/author1.mp4'
+  ];
 
-      if (show) {
-        it.style.display = '';
-        // re-trigger animation
-        requestAnimationFrame(() => it.classList.add('is-visible'));
+  // shuffle once
+  const queue = [...featuredPool].sort(() => 0.5 - Math.random());
+  let idx = 0;
+
+  function setSrc(i){
+    if (i >= queue.length) return;
+    idx = i;
+    featuredVideo.src = queue[i];
+    featuredVideo.load();
+  }
+
+  // If a video fails (missing / unsupported), try next
+  featuredVideo.addEventListener('error', () => {
+    setSrc(idx + 1);
+  });
+
+  // IMPORTANT: set a src immediately so the element has size on iPhone
+  setSrc(0);
+
+  // Autoplay only when visible
+  const videoIO = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        featuredVideo.play().catch(()=>{});
       } else {
-        it.classList.remove('is-visible');
-        // wait for fade-out then hide
-        setTimeout(() => { it.style.display = 'none'; }, 180);
+        featuredVideo.pause();
       }
     });
-  };
+  }, { threshold: 0.25 });
 
-  btns.forEach(b => b.addEventListener('click', () => {
-    btns.forEach(x => x.classList.remove('is-active'));
-    b.classList.add('is-active');
-    applyFilter(b.dataset.filter);
-  }));
+  videoIO.observe(featuredVideo);
 
-  // initial
-  applyFilter('all');
+  // Sound toggle only on click (policy-safe)
+  featuredVideo.addEventListener('click', () => {
+    featuredVideo.muted = !featuredVideo.muted;
+    featuredVideo.volume = 0.8;
+  });
 }
+
+
+    // Hover sound (desktop)
+  const isTouch = window.matchMedia('(hover: none)').matches;
+
+  if (!isTouch) {
+      // Sound toggle only on click (safe with autoplay policies)
+  featuredVideo.addEventListener('click', () => {
+    featuredVideo.muted = !featuredVideo.muted;
+    featuredVideo.volume = 0.8;
+  });
+
+  } else {
+    // Tap to toggle sound (mobile)
+    featuredVideo.addEventListener('click', () => {
+      featuredVideo.muted = !featuredVideo.muted;
+      featuredVideo.volume = 0.8;
+    });
+  }
+
+
