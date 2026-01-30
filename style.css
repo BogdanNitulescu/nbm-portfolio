@@ -510,8 +510,12 @@ video:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.18); }
 }
 
 
-/* TEMP FIX: force show work items */
-.work-item{ opacity: 1 !important; transform: none !important; }
+.reveal.is-visible{
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+
 
 
 
