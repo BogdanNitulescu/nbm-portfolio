@@ -12,7 +12,7 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 });
 
 // Reveal on scroll (generic)
-const baseReveal = document.querySelectorAll('.section, .card, .page-hero, .videos-grid');
+const baseReveal = document.querySelectorAll('.section, .card, .page-hero, .videos-grid, .work-item');
 baseReveal.forEach(el => el.classList.add('reveal'));
 
 const io = new IntersectionObserver((entries) => {
@@ -25,12 +25,6 @@ const io = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 
 baseReveal.forEach(el => io.observe(el));
-
-// Work items: show immediately + allow filter animations
-document.querySelectorAll('.work-item').forEach((it, i) => {
-  it.classList.add('is-visible');
-});
-
 
 /* ---- WORK FILTERS (only if present on page) ---- */
 const btns = document.querySelectorAll('.filter-btn');
@@ -63,4 +57,3 @@ if (btns.length && items.length) {
   // initial
   applyFilter('all');
 }
-
