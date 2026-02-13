@@ -31,13 +31,23 @@ const featuredCard = document.getElementById('featuredCard');
 const featuredVideo = document.getElementById('featuredVideo');
 
 if (featuredCard && featuredVideo) {
-  const featuredPool = [
-    'assets/realestate1.mp4',
-    'assets/realestate2.mp4',
-    'assets/influencer1.mp4',
-    'assets/biz1.mp4',
-    'assets/author1.mp4'
-  ];
+  const localVideos = [
+  "assets/author1.mp4",
+  "assets/author2.mp4",
+  "assets/author3.mp4",
+  "assets/biz1.mp4",
+  "assets/biz2.mp4",
+  "assets/influencer1.mp4",
+  "assets/influencer2.mp4",
+  "assets/realestate1.mp4",
+  "assets/realestate2.mp4",
+
+  // NEW VIDEOS
+  "assets/Rec1Kinetic.mp4",
+  "assets/Rec2Dinamic.mp4",
+  "assets/Rec3Kinetic.mp4"
+];
+
 
   // shuffle once
   const queue = [...featuredPool].sort(() => 0.5 - Math.random());
@@ -96,5 +106,6 @@ if (featuredCard && featuredVideo) {
       featuredVideo.volume = 0.8;
     });
   }
+
 
 
